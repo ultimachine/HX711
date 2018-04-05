@@ -76,7 +76,8 @@ uint32_t shiftInSlower( uint32_t ulDataPin, uint32_t ulClockPin, uint32_t ulBitO
 
 long HX711::read() {
 	// wait for the chip to become ready
-	while (!is_ready()) {
+	int timeout_cycles = 20000;
+	while (!is_ready() && (timeout_cycles--) ) {
 		// Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
 		yield();
 	}
