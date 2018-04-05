@@ -48,6 +48,32 @@ void HX711::set_gain(byte gain) {
 	read();
 }
 
+uint32_t shiftInSlower( uint32_t ulDataPin, uint32_t ulClockPin, uint32_t ulBitOrder )
+{
+	uint8_t value = 0 ;
+	uint8_t i ;
+
+	for ( i=0 ; i < 8 ; ++i )
+    {
+		digitalWrite( ulClockPin, HIGH ) ;
+		delayMicroseconds(1);
+
+		if ( ulBitOrder == LSBFIRST )
+        {
+			value |= digitalRead( ulDataPin ) << i ;
+        }
+		else
+        {
+			value |= digitalRead( ulDataPin ) << (7 - i) ;
+        }
+
+		digitalWrite( ulClockPin, LOW ) ;
+		delayMicroseconds(1);
+	}
+
+	return value ;
+}
+
 long HX711::read() {
 	// wait for the chip to become ready
 	while (!is_ready()) {
@@ -60,9 +86,9 @@ long HX711::read() {
 	uint8_t filler = 0x00;
 
 	// pulse the clock pin 24 times to read the data
-	data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	data[2] = shiftInSlower(DOUT, PD_SCK, MSBFIRST);
+	data[1] = shiftInSlower(DOUT, PD_SCK, MSBFIRST);
+	data[0] = shiftInSlower(DOUT, PD_SCK, MSBFIRST);
 
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
