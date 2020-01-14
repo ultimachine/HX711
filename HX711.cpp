@@ -55,8 +55,9 @@ uint32_t shiftInSlower( uint32_t ulDataPin, uint32_t ulClockPin, uint32_t ulBitO
 
 	for ( i=0 ; i < 8 ; ++i )
     {
-		digitalWrite( ulClockPin, HIGH ) ;
-		delayMicroseconds(1);
+		//digitalWrite( ulClockPin, HIGH ) ;
+                pinMode(ulClockPin, INPUT);
+		delayMicroseconds(10);
 
 		if ( ulBitOrder == LSBFIRST )
         {
@@ -66,9 +67,9 @@ uint32_t shiftInSlower( uint32_t ulDataPin, uint32_t ulClockPin, uint32_t ulBitO
         {
 			value |= digitalRead( ulDataPin ) << (7 - i) ;
         }
-
+                pinMode(ulClockPin, OUTPUT);
 		digitalWrite( ulClockPin, LOW ) ;
-		delayMicroseconds(1);
+		delayMicroseconds(10);
 	}
 
 	return value ;
@@ -93,8 +94,12 @@ long HX711::read() {
 
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
-		digitalWrite(PD_SCK, HIGH);
+		//digitalWrite(PD_SCK, HIGH);
+                pinMode(PD_SCK, INPUT);
+                delayMicroseconds(10);
+                pinMode(PD_SCK, OUTPUT);
 		digitalWrite(PD_SCK, LOW);
+                delayMicroseconds(10);
 	}
 
 	// Replicate the most significant bit to pad out a 32-bit signed integer
@@ -152,8 +157,11 @@ long HX711::get_offset() {
 }
 
 void HX711::power_down() {
-	digitalWrite(PD_SCK, LOW);
-	digitalWrite(PD_SCK, HIGH);
+        pinMode(PD_SCK, OUTPUT);
+        digitalWrite(PD_SCK, LOW);
+        delayMicroseconds(10);
+        pinMode(PD_SCK, INPUT);
+        delayMicroseconds(10);
 }
 
 void HX711::power_up() {
